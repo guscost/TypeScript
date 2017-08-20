@@ -172,7 +172,7 @@ namespace ts {
             paramType: Diagnostics.KIND,
             showInSimplifiedHelpView: true,
             category: Diagnostics.Basic_Options,
-            description: Diagnostics.Specify_JSX_code_generation_Colon_preserve_react_native_or_react,
+            description: Diagnostics.Specify_JSX_code_generation_Colon_preserve_react_native_react_or_object,
         },
         {
             name: "declaration",
