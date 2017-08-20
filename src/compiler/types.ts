@@ -3682,7 +3682,8 @@ namespace ts {
         None = 0,
         Preserve = 1,
         React = 2,
-        ReactNative = 3
+        ReactNative = 3,
+        Object = 4
     }
 
     export const enum NewLineKind {
