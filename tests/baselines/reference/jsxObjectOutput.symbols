@@ -1,0 +1,29 @@
+=== tests/cases/compiler/jsxObjectOutput.tsx ===
+var elem = <div>
+>elem : Symbol(elem, Decl(jsxObjectOutput.tsx, 0, 3))
+>div : Symbol(unknown)
+
+    <h1>test</h1>
+>h1 : Symbol(unknown)
+>h1 : Symbol(unknown)
+
+    <h2>{40 + 2}</h2>
+>h2 : Symbol(unknown)
+>h2 : Symbol(unknown)
+
+    <ol>{
+>ol : Symbol(unknown)
+
+        [1,2,3].map(num => <li>num</li>)
+>[1,2,3].map : Symbol(Array.map, Decl(lib.d.ts, --, --))
+>map : Symbol(Array.map, Decl(lib.d.ts, --, --))
+>num : Symbol(num, Decl(jsxObjectOutput.tsx, 4, 20))
+>li : Symbol(unknown)
+>li : Symbol(unknown)
+
+    }</ol>
+>ol : Symbol(unknown)
+
+</div>;
+>div : Symbol(unknown)
+
