@@ -78,52 +78,72 @@ namespace ts {
         }
 
         function visitJsxOpeningLikeElement(node: JsxOpeningLikeElement, children: ReadonlyArray<JsxChild>, isChild: boolean, location: TextRange) {
-            const tagName = getTagName(node);
-            let objectProperties: Expression;
-            const attrs = node.attributes.properties;
-            if (attrs.length === 0) {
-                // When there are no attributes, React wants "null"
-                objectProperties = createNull();
-            }
-            else {
-                // Map spans of JsxAttribute nodes into object literals and spans
-                // of JsxSpreadAttribute nodes into expressions.
-                const segments = flatten<Expression | ObjectLiteralExpression>(
-                    spanMap(attrs, isJsxSpreadAttribute, (attrs, isSpread) => isSpread
-                        ? map(attrs, transformJsxSpreadAttributeToExpression)
-                        : createObjectLiteral(map(attrs, transformJsxAttributeToObjectLiteralElement))
-                    )
+            if (compilerOptions.jsx === JsxEmit.Object) {
+                const tagName = getTagName(node);
+                const attrs = node.attributes.properties;
+                const element = createObjectLiteralForJsxElement(
+                    "tag",
+                    "children",
+                    tagName,
+                    map(attrs, transformJsxAttributeToObjectLiteralElement),
+                    mapDefined(children, transformJsxChildToExpression),
+                    location
                 );
 
-                if (isJsxSpreadAttribute(attrs[0])) {
-                    // We must always emit at least one object literal before a spread
-                    // argument.
-                    segments.unshift(createObjectLiteral());
+                if (isChild) {
+                    startOnNewLine(element);
                 }
 
-                // Either emit one big object literal (no spread attribs), or
-                // a call to the __assign helper.
-                objectProperties = singleOrUndefined(segments);
-                if (!objectProperties) {
-                    objectProperties = createAssignHelper(context, segments);
+                return element;
+            }
+            else {
+                const tagName = getTagName(node);
+                let objectProperties: Expression;
+                const attrs = node.attributes.properties;
+                if (attrs.length === 0) {
+                    // When there are no attributes, React wants "null"
+                    objectProperties = createNull();
                 }
+                else {
+                    // Map spans of JsxAttribute nodes into object literals and spans
+                    // of JsxSpreadAttribute nodes into expressions.
+                    const segments = flatten<Expression | ObjectLiteralExpression>(
+                        spanMap(attrs, isJsxSpreadAttribute, (attrs, isSpread) => isSpread
+                            ? map(attrs, transformJsxSpreadAttributeToExpression)
+                            : createObjectLiteral(map(attrs, transformJsxAttributeToObjectLiteralElement))
+                        )
+                    );
+
+                    if (isJsxSpreadAttribute(attrs[0])) {
+                        // We must always emit at least one object literal before a spread
+                        // argument.
+                        segments.unshift(createObjectLiteral());
+                    }
+
+                    // Either emit one big object literal (no spread attribs), or
+                    // a call to the __assign helper.
+                    objectProperties = singleOrUndefined(segments);
+                    if (!objectProperties) {
+                        objectProperties = createAssignHelper(context, segments);
+                    }
+                }
+
+                const element = createFunctionCallForJsxElement(
+                    context.getEmitResolver().getJsxFactoryEntity(),
+                    compilerOptions.reactNamespace,
+                    tagName,
+                    objectProperties,
+                    mapDefined(children, transformJsxChildToExpression),
+                    node,
+                    location
+                );
+
+                if (isChild) {
+                    startOnNewLine(element);
+                }
+
+                return element;
             }
-
-            const element = createExpressionForJsxElement(
-                context.getEmitResolver().getJsxFactoryEntity(),
-                compilerOptions.reactNamespace,
-                tagName,
-                objectProperties,
-                mapDefined(children, transformJsxChildToExpression),
-                node,
-                location
-            );
-
-            if (isChild) {
-                startOnNewLine(element);
-            }
-
-            return element;
         }
 
         function transformJsxSpreadAttributeToExpression(node: JsxSpreadAttribute) {

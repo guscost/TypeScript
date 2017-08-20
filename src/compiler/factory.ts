@@ -2881,7 +2881,7 @@ namespace ts {
             );
     }
 
-    export function createExpressionForJsxElement(jsxFactoryEntity: EntityName, reactNamespace: string, tagName: Expression, props: Expression, children: Expression[], parentElement: JsxOpeningLikeElement, location: TextRange): LeftHandSideExpression {
+    export function createFunctionCallForJsxElement(jsxFactoryEntity: EntityName, reactNamespace: string, tagName: Expression, props: Expression, children: Expression[], parentElement: JsxOpeningLikeElement, location: TextRange): LeftHandSideExpression {
         const argumentsList = [tagName];
         if (props) {
             argumentsList.push(props);
@@ -2909,6 +2909,30 @@ namespace ts {
                 /*typeArguments*/ undefined,
                 argumentsList
             ),
+            location
+        );
+    }
+
+    export function createObjectLiteralForJsxElement(tagKey: string, childrenKey: string, tagName: Expression, props: PropertyAssignment[], children: Expression[], location: TextRange): LeftHandSideExpression {
+        const propsList = [createPropertyAssignment(tagKey, tagName)];
+        propsList.push.apply(propsList, props);
+
+        let childrenExpression: Expression;
+        if (children.length === 1) {
+            childrenExpression = children[0];
+        }
+        else {
+            const childList = [];
+            for (const child of children) {
+                child.startsOnNewLine = true;
+                childList.push(child);
+            }
+            childrenExpression = createArrayLiteral(childList);
+        }
+        propsList.push(createPropertyAssignment(childrenKey, childrenExpression));
+
+        return setTextRange(
+            createObjectLiteral(propsList),
             location
         );
     }

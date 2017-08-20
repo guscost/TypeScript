@@ -1,0 +1,43 @@
+=== tests/cases/compiler/jsxObjectOutput.tsx ===
+var elem = <div>
+>elem : any
+><div>    <h1>test</h1>    <h2>{40 + 2}</h2>    <ol>{        [1,2,3].map(num => <li>num</li>)    }</ol></div> : any
+>div : any
+
+    <h1>test</h1>
+><h1>test</h1> : any
+>h1 : any
+>h1 : any
+
+    <h2>{40 + 2}</h2>
+><h2>{40 + 2}</h2> : any
+>h2 : any
+>40 + 2 : number
+>40 : 40
+>2 : 2
+>h2 : any
+
+    <ol>{
+><ol>{        [1,2,3].map(num => <li>num</li>)    }</ol> : any
+>ol : any
+
+        [1,2,3].map(num => <li>num</li>)
+>[1,2,3].map(num => <li>num</li>) : any[]
+>[1,2,3].map : <U>(callbackfn: (value: number, index: number, array: number[]) => U, thisArg?: any) => U[]
+>[1,2,3] : number[]
+>1 : 1
+>2 : 2
+>3 : 3
+>map : <U>(callbackfn: (value: number, index: number, array: number[]) => U, thisArg?: any) => U[]
+>num => <li>num</li> : (num: number) => any
+>num : number
+><li>num</li> : any
+>li : any
+>li : any
+
+    }</ol>
+>ol : any
+
+</div>;
+>div : any
+
